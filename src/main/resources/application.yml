@@ -1,0 +1,10 @@
+server:
+  port: 8088
+fcubs:
+  de-service-url: http://10.1.12.71:8101/FCUBSDEService/FCUBSDEService
+  source: FCAT
+  user-id: TAKEON02
+  password: Oracle@2
+  branch: 100
+  service: FCUBSDEService
+  operation: CreateMjrnlbook

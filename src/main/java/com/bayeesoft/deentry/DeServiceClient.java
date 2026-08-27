@@ -70,6 +70,25 @@ public class DeServiceClient {
         LOGGER.debug("Sending Multi DE Journal request to Flexcube: {}",
                 deServiceUrl);
 
+        LOGGER.info(" detbsBatchMaster batchNo : {}",
+                soapRequest.getFCUBSBODY().getDetbsJrnlTxnMasterFull().getDetbsBatchMaster().getBATCHNO());
+
+        LOGGER.info(" detbsBatchMaster description : {}",
+                soapRequest.getFCUBSBODY().getDetbsJrnlTxnMasterFull().getDetbsBatchMaster().getDESCRIPTION());
+
+        LOGGER.info(" detbsBatchMaster credit : {}",
+                soapRequest.getFCUBSBODY().getDetbsJrnlTxnMasterFull().getDetbsBatchMaster().getCREDIT());
+
+        LOGGER.info(" detbsBatchMaster debit : {}",
+                soapRequest.getFCUBSBODY().getDetbsJrnlTxnMasterFull().getDetbsBatchMaster().getDEBIT());
+
+        LOGGER.info(" detbsBatchMaster drentotal : {}",
+                soapRequest.getFCUBSBODY().getDetbsJrnlTxnMasterFull().getDetbsBatchMaster().getDRENTTOTAL());
+
+        LOGGER.info(" detbsBatchMaster crentotal : {}",
+                soapRequest.getFCUBSBODY().getDetbsJrnlTxnMasterFull().getDetbsBatchMaster().getDRENTTOTAL());
+
+
         try {
 
             CREATEMJRNLBOOKFSFSRES response =
@@ -191,10 +210,12 @@ public class DeServiceClient {
         MultiJrnlBookFullType.DetbsBatchMaster batchMaster =
                 new MultiJrnlBookFullType.DetbsBatchMaster();
 
-        batchMaster.setBATCHNO(request.getBatchno());
-        batchMaster.setDESCRIPTION(request.getDescription());
-        batchMaster.setDRENTTOTAL(request.getTotaldr());
-        batchMaster.setCRENTTOTAL(request.getTotalcr());
+        batchMaster.setBATCHNO(request.getDetbsBatchMaster().getBatchno());
+        batchMaster.setDESCRIPTION(request.getDetbsBatchMaster().getDescription());
+        batchMaster.setCREDIT(request.getDetbsBatchMaster().getCredit());
+        batchMaster.setDEBIT(request.getDetbsBatchMaster().getCredit());
+        batchMaster.setDRENTTOTAL(request.getDetbsBatchMaster().getDrenttotal());
+        batchMaster.setCRENTTOTAL(request.getDetbsBatchMaster().getCrenttotal());
 
         journal.setDetbsBatchMaster(batchMaster);
 
@@ -204,9 +225,12 @@ public class DeServiceClient {
         MultiJrnlBookFullType.DevwsBatchMaster devwsBatchMaster =
                 new MultiJrnlBookFullType.DevwsBatchMaster();
 
-        devwsBatchMaster.setBATCHNUMBER(request.getBatchno());
-        devwsBatchMaster.setDESCRIPTION(request.getDescription());
-        devwsBatchMaster.setBALANCING("Y");
+        devwsBatchMaster.setBATCHNUMBER(request.getDevwsBatchMaster().getBatchnumber());
+        devwsBatchMaster.setDESCRIPTION(request.getDevwsBatchMaster().getDescription());
+        devwsBatchMaster.setCREDIT(request.getDevwsBatchMaster().getCredit());
+        devwsBatchMaster.setDEBIT(request.getDevwsBatchMaster().getDebit());
+        devwsBatchMaster.setLASTAUTHORISEDBY(request.getDevwsBatchMaster().getLastauthorisedby());
+        devwsBatchMaster.setBALANCING(request.getDevwsBatchMaster().getBalancing());
 
         journal.setDevwsBatchMaster(devwsBatchMaster);
 
