@@ -1,10 +1,16 @@
-server:
-  port: 8088
+spring:
+  application:
+    name=deebtry:
+
 fcubs:
+  username: ${FCUBS_USERNAME:TAKEON02}
   de-service-url: http://10.1.12.71:8101/FCUBSDEService/FCUBSDEService
-  source: FCAT
-  user-id: TAKEON02
-  password: Oracle@2
-  branch: 100
-  service: FCUBSDEService
-  operation: CreateMjrnlbook
+  source: ${FCUBS_SOURCE:FCAT}
+  msgid: ${FCUBS_MSGID:}
+  userid: ${FCUBS_USERID:${FCUBS_USERNAME:TAKEON02}}
+  password: ${FCUBS_PASSWORD:Oracle@123}
+  branch: ${FCUBS_BRANCH:100}
+  service: ${FCUBS_SERVICE:FCUBSRTService}
+  moduleid: ${FCUBS_MODULEID:}
+  correlid: ${FCUBS_CORRELID:}
+  operation: ${FCUBS_OPERATION:CreateMjrnlbook}

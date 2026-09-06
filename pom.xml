@@ -141,7 +141,7 @@
 
 				<configuration>
 
-					<packageName>com.bayeesoft.stub</packageName>
+					<packageName>com.techstack.corebanking.stub</packageName>
 
 					<wsdlUrls>
 
