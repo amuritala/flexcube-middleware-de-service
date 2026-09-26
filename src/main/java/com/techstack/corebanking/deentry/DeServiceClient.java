@@ -1,13 +1,14 @@
-package com.techstack.corebanking.deentry;
+package com.bayeesoft.deentry;
 
-import com.techstack.corebanking.deentry.dto.JournalDetailRequest;
-import com.techstack.corebanking.deentry.dto.MultiDeJournalRequest;
-import com.techstack.corebanking.deentry.dto.TxnMISFullTypeRequest;
+import com.bayeesoft.DTO.QueryRequest;
+import com.bayeesoft.DTO.ReversalRequest;
+import com.bayeesoft.deentry.dto.*;
+import com.bayeesoft.stub.*;
 
-import com.techstack.corebanking.stub.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,9 @@ import java.util.List;
 
 @Service
 public class DeServiceClient {
+    @Autowired
+    private Jaxb2Marshaller marshaller;
+    private WebServiceTemplate template;
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(DeServiceClient.class);
@@ -37,12 +41,6 @@ public class DeServiceClient {
 
     @Value("${fcubs.branch:100}")
     private String branch;
-
-    @Value("${fcubs.msgid:}")
-    private String msgid;
-
-    @Value("${fcubs.moduleid:}")
-    private String moduleId;
 
     @Value("${fcubs.service:FCUBSDEService}")
     private String service;
@@ -75,9 +73,6 @@ public class DeServiceClient {
 
         LOGGER.debug("Sending Multi DE Journal request to Flexcube: {}",
                 deServiceUrl);
-
-        LOGGER.info(" detbsBatchMaster batchNo : {}",
-                soapRequest.getFCUBSBODY().getDetbsJrnlTxnMasterFull().getDetbsBatchMaster().getBATCHNO());
 
         try {
 
@@ -143,11 +138,11 @@ public class DeServiceClient {
 
         header.setSOURCE(source);
         header.setUBSCOMP(UBSCOMPType.FCUBS);
-        header.setMSGID(msgid);
+        header.setMSGID("");
         header.setUSERID(userId);
         header.setPASSWORD(password);
         header.setBRANCH(branch);
-        header.setMODULEID(moduleId);
+        header.setMODULEID("");
         header.setSERVICE(service);
         header.setOPERATION(operation);
 
@@ -163,7 +158,7 @@ public class DeServiceClient {
         /*
          * Master information
          */
-        journal.setREFERENCENO(request.getReferenceno());
+       // journal.setREFERENCENO(request.getReferenceno());
         journal.setBATCHNO(request.getBatchno());
         journal.setCURRNO(request.getCurrno());
         journal.setTEMPLATECODE(request.getTemplatecode());
@@ -208,6 +203,9 @@ public class DeServiceClient {
         batchMaster.setCRENTTOTAL(request.getDetbsBatchMaster().getCrenttotal());
 
         journal.setDetbsBatchMaster(batchMaster);
+
+        System.out.println("Drentris is :" + request.getDetbsBatchMaster().getDrenttotal());
+        System.out.println("Crentris is :" + request.getDetbsBatchMaster().getCrenttotal());
 
         /*
          * Development batch master
@@ -329,7 +327,7 @@ public class DeServiceClient {
                     "Multi DE Journal request cannot be null"
             );
         }
-
+/**
         if (request.getReferenceno() == null ||
                 request.getReferenceno().isBlank()) {
 
@@ -337,7 +335,7 @@ public class DeServiceClient {
                     "Reference number is required"
             );
         }
-
+**/
         if (request.getBatchno() == null ||
                 request.getBatchno().isBlank()) {
 
@@ -353,6 +351,218 @@ public class DeServiceClient {
                     "Journal transaction details are required"
             );
         }
+
+
+
+
+
     }
+
+
+    // another service start here
+
+    public  AUTHORIZEMJRNLBOOKFSFSRES authmuljn (AutorizeRequeat autorizeequeat) {
+
+        AUTHORIZEMJRNLBOOKFSFSREQ fcubsMainHeader = new AUTHORIZEMJRNLBOOKFSFSREQ();
+        FCUBSHEADERType fcubsheader = new FCUBSHEADERType();
+        fcubsheader.setSOURCE("FCAT");
+        fcubsheader.setUBSCOMP(UBSCOMPType.FCUBS);
+        fcubsheader.setMSGID("");
+        fcubsheader.setCORRELID(null);
+        fcubsheader.setUSERID("TAKEON02");
+        fcubsheader.setPASSWORD("Oracle@2");
+        fcubsheader.setBRANCH("101");
+        fcubsheader.setMODULEID("");
+        fcubsheader.setSERVICE("FCUBSDEService");
+        fcubsheader.setOPERATION("AuthorizeMjrnlbook");
+        fcubsMainHeader.setFCUBSHEADER(fcubsheader);
+
+        MultiJrnlBookFullType multibook = new MultiJrnlBookFullType();
+        multibook.setREFERENCENO(autorizeequeat.getReferenceno());
+        multibook.setBATCHNO(autorizeequeat.getBatchno());
+        multibook.setBRANCHCODE(autorizeequeat.getBranchcode());
+
+        AUTHORIZEMJRNLBOOKFSFSREQ.FCUBSBODY flexbosy = new AUTHORIZEMJRNLBOOKFSFSREQ.FCUBSBODY();
+        flexbosy.setDetbsJrnlTxnMasterFull(multibook);
+        fcubsMainHeader.setFCUBSBODY(flexbosy);
+
+        template = new WebServiceTemplate(marshaller);
+        AUTHORIZEMJRNLBOOKFSFSRES response = (AUTHORIZEMJRNLBOOKFSFSRES)  template.marshalSendAndReceive(deServiceUrl,fcubsMainHeader);
+        return response ;
+
+
+    }
+
+
+
+
+    public CREATEMJRNLBOOKFSFSRES CreateMuiltiv2 (MultiDeJournalRequest request) {
+
+        String brn =  request.getDetbsJrnlTxnDetail().get(0).getBranchcode();
+        CREATEMJRNLBOOKFSFSREQ fcubsMainHeader = new CREATEMJRNLBOOKFSFSREQ();
+        FCUBSHEADERType fcubsheader = new FCUBSHEADERType();
+        fcubsheader.setSOURCE("FCUBS");
+        fcubsheader.setUBSCOMP(UBSCOMPType.FCUBS);
+        fcubsheader.setMSGID("");
+        fcubsheader.setCORRELID(null);
+        fcubsheader.setUSERID("TAKEON02");
+        fcubsheader.setPASSWORD("Oracle@2");
+        fcubsheader.setBRANCH(brn);
+        fcubsheader.setMODULEID("");
+        fcubsheader.setSERVICE("FCUBSDEService");
+        fcubsheader.setOPERATION("CreateMjrnlbook");
+        fcubsMainHeader.setFCUBSHEADER(fcubsheader);
+
+
+        MultiJrnlBookFullType  multijrnltemlfulltype = new MultiJrnlBookFullType();
+
+        multijrnltemlfulltype.setBRANCHCODE(request.getBranchcode());
+        multijrnltemlfulltype.setBATCHNO(request.getBatchno());
+        //multijrnltemlfulltype.setREFERENCENO(request.getReferenceno());
+        multijrnltemlfulltype.setCCY(request.getCcy());
+        multijrnltemlfulltype.setCURRNO(request.getCurrno());
+        multijrnltemlfulltype.setTOTALDR(request.getTotaldr());
+        multijrnltemlfulltype.setTOTALCR(request.getTotalcr());
+        multijrnltemlfulltype.setTOTALNO(request.getTotalno());
+
+
+        MultiJrnlBookFullType.DetbsJrnlTxnDetail detail1 = new MultiJrnlBookFullType.DetbsJrnlTxnDetail();
+        detail1.setSERIALNO(request.getDetbsJrnlTxnDetail().get(0).getSerialno());
+        detail1.setDRCR(request.getDetbsJrnlTxnDetail().get(0).getDrcr());
+        detail1.setACCORGL(request.getDetbsJrnlTxnDetail().get(0).getAccorgl());
+        detail1.setTXNCODE(request.getDetbsJrnlTxnDetail().get(0).getTxncode());
+        detail1.setADDLTEXT(request.getDetbsJrnlTxnDetail().get(0).getAddltext());
+        detail1.setCCY(request.getDetbsJrnlTxnDetail().get(0).getCcy());
+        detail1.setCUSTOMER(request.getDetbsJrnlTxnDetail().get(0).getCustomer());
+        detail1.setBRANCHCODE(request.getDetbsJrnlTxnDetail().get(0).getBranchcode());
+        detail1.setAMOUNT(request.getDetbsJrnlTxnDetail().get(0).getAmount());
+        detail1.setACCOUNT(request.getDetbsJrnlTxnDetail().get(0).getAccount());
+        detail1.setLCYAMOUNT(request.getDetbsJrnlTxnDetail().get(0).getLcyamount());
+        detail1.setEXCHRATE(request.getDetbsJrnlTxnDetail().get(0).getExchrate());
+        detail1.setUSERREFNO(request.getDetbsJrnlTxnDetail().get(0).getUserrefno());
+        detail1.setACDESC(request.getDetbsJrnlTxnDetail().get(0).getAcdesc());
+        detail1.setINSTRUMENTNO(request.getDetbsJrnlTxnDetail().get(0).getInstrumentno());
+        // Add all to the list
+        multijrnltemlfulltype.getDetbsJrnlTxnDetail().add(detail1);
+
+        MultiJrnlBookFullType.DetbsJrnlTxnDetail detail2 = new MultiJrnlBookFullType.DetbsJrnlTxnDetail();
+        detail2.setSERIALNO(request.getDetbsJrnlTxnDetail().get(1).getSerialno());
+        detail2.setDRCR(request.getDetbsJrnlTxnDetail().get(1).getDrcr());
+        detail2.setACCORGL(request.getDetbsJrnlTxnDetail().get(1).getAccorgl());
+        detail2.setTXNCODE(request.getDetbsJrnlTxnDetail().get(1).getTxncode());
+        detail2.setADDLTEXT(request.getDetbsJrnlTxnDetail().get(1).getAddltext());
+        detail2.setCCY(request.getDetbsJrnlTxnDetail().get(1).getCcy());
+        detail2.setCUSTOMER(request.getDetbsJrnlTxnDetail().get(1).getCustomer());
+        detail2.setBRANCHCODE(request.getDetbsJrnlTxnDetail().get(1).getBranchcode());
+        detail2.setAMOUNT(request.getDetbsJrnlTxnDetail().get(1).getAmount());
+        detail2.setACCOUNT(request.getDetbsJrnlTxnDetail().get(1).getAccount());
+        detail2.setLCYAMOUNT(request.getDetbsJrnlTxnDetail().get(1).getLcyamount());
+        detail2.setEXCHRATE(request.getDetbsJrnlTxnDetail().get(1).getExchrate());
+        detail2.setUSERREFNO(request.getDetbsJrnlTxnDetail().get(1).getUserrefno());
+        detail2.setACDESC(request.getDetbsJrnlTxnDetail().get(1).getAcdesc());
+        detail2.setINSTRUMENTNO(request.getDetbsJrnlTxnDetail().get(1).getInstrumentno());
+
+        multijrnltemlfulltype.getDetbsJrnlTxnDetail().add(detail2);
+
+
+        MultiJrnlBookFullType.DetbsBatchMaster batchMaster =
+                new MultiJrnlBookFullType.DetbsBatchMaster();
+
+        batchMaster.setBATCHNO(request.getDetbsBatchMaster().getBatchno());
+        batchMaster.setDESCRIPTION(request.getDetbsBatchMaster().getDescription());
+        batchMaster.setCREDIT(request.getDetbsBatchMaster().getCredit());
+        batchMaster.setDEBIT(request.getDetbsBatchMaster().getCredit());
+        batchMaster.setDRENTTOTAL(request.getDetbsBatchMaster().getDrenttotal());
+        batchMaster.setCRENTTOTAL(request.getDetbsBatchMaster().getCrenttotal());
+
+        multijrnltemlfulltype.setDetbsBatchMaster(batchMaster);
+
+        /*
+         * Development batch master
+         */
+        MultiJrnlBookFullType.DevwsBatchMaster devwsBatchMaster =
+                new MultiJrnlBookFullType.DevwsBatchMaster();
+
+        devwsBatchMaster.setBATCHNUMBER(request.getDevwsBatchMaster().getBatchnumber());
+        devwsBatchMaster.setDESCRIPTION(request.getDevwsBatchMaster().getDescription());
+        devwsBatchMaster.setCREDIT(request.getDevwsBatchMaster().getCredit());
+        devwsBatchMaster.setDEBIT(request.getDevwsBatchMaster().getDebit());
+        devwsBatchMaster.setLASTAUTHORISEDBY(request.getDevwsBatchMaster().getLastauthorisedby());
+        devwsBatchMaster.setBALANCING(request.getDevwsBatchMaster().getBalancing());
+
+
+
+        multijrnltemlfulltype.setDevwsBatchMaster(devwsBatchMaster);
+
+        CREATEMJRNLBOOKFSFSREQ.FCUBSBODY flexbosy = new CREATEMJRNLBOOKFSFSREQ.FCUBSBODY();
+        flexbosy.setDetbsJrnlTxnMasterFull(multijrnltemlfulltype);
+        fcubsMainHeader.setFCUBSBODY(flexbosy);
+        template = new WebServiceTemplate(marshaller);
+        CREATEMJRNLBOOKFSFSRES response = (CREATEMJRNLBOOKFSFSRES)  template.marshalSendAndReceive(deServiceUrl,fcubsMainHeader);
+        return response ;
+    }
+
+   public REVERSECOMMONREVERSALFSFSRES ReseverJrn (ReversalRequest reversalRequest) {
+
+
+       REVERSECOMMONREVERSALFSFSREQ fcubsMainHeader = new REVERSECOMMONREVERSALFSFSREQ();
+       FCUBSHEADERType fcubsheader = new FCUBSHEADERType();
+       fcubsheader.setSOURCE("FCUBS");
+       fcubsheader.setUBSCOMP(UBSCOMPType.FCUBS);
+       fcubsheader.setMSGID("");
+       fcubsheader.setCORRELID(null);
+       fcubsheader.setUSERID("TAKEON02");
+       fcubsheader.setPASSWORD("Oracle@2");
+       fcubsheader.setBRANCH("100");
+       fcubsheader.setMODULEID("");
+       fcubsheader.setSERVICE("FCUBSDEService");
+       fcubsheader.setOPERATION("ReverseCommonReversal");
+       fcubsMainHeader.setFCUBSHEADER(fcubsheader);
+
+       CommonReversalFullType reserval = new CommonReversalFullType();
+       reserval.setTRNREFNO(reversalRequest.getTrnrefno());
+       reserval.setAMOUNTTAGG(reversalRequest.getAmounttagg());
+       reserval.setEVENTSRNOO(reversalRequest.getEventsrnoo());
+
+
+
+
+       REVERSECOMMONREVERSALFSFSREQ.FCUBSBODY flexbosy = new REVERSECOMMONREVERSALFSFSREQ.FCUBSBODY();
+       flexbosy.setAcvwsAllAcEntriesFull(reserval);
+       fcubsMainHeader.setFCUBSBODY(flexbosy);
+       template = new WebServiceTemplate(marshaller);
+       REVERSECOMMONREVERSALFSFSRES response = (REVERSECOMMONREVERSALFSFSRES)  template.marshalSendAndReceive(deServiceUrl,fcubsMainHeader);
+       return response ;
+
+   }
+
+   public QUERYMJRNLBOOKIOFSRES QueryMultiJrn(QueryRequest queryRequest) {
+
+       QUERYMJRNLBOOKIOFSREQ fcubsMainHeader = new QUERYMJRNLBOOKIOFSREQ();
+       FCUBSHEADERType fcubsheader = new FCUBSHEADERType();
+       fcubsheader.setSOURCE("FCUBS");
+       fcubsheader.setUBSCOMP(UBSCOMPType.FCUBS);
+       fcubsheader.setMSGID("");
+       fcubsheader.setCORRELID(null);
+       fcubsheader.setUSERID("TAKEON02");
+       fcubsheader.setPASSWORD("Oracle@2");
+       fcubsheader.setBRANCH("100");
+       fcubsheader.setMODULEID("");
+       fcubsheader.setSERVICE("FCUBSDEService");
+       fcubsheader.setOPERATION("QueryMjrnlbook");
+       fcubsMainHeader.setFCUBSHEADER(fcubsheader);
+
+       MultiJrnlBookQueryIOType  multibookquery = new MultiJrnlBookQueryIOType() ;
+       multibookquery.setREFERENCENO(queryRequest.getReferenceno());
+
+       QUERYMJRNLBOOKIOFSREQ.FCUBSBODY flexbosy = new QUERYMJRNLBOOKIOFSREQ.FCUBSBODY();
+       flexbosy.setDetbsJrnlTxnMasterIO(multibookquery);
+       fcubsMainHeader.setFCUBSBODY(flexbosy);
+       template = new WebServiceTemplate(marshaller);
+       QUERYMJRNLBOOKIOFSRES response = (QUERYMJRNLBOOKIOFSRES)  template.marshalSendAndReceive(deServiceUrl,fcubsMainHeader);
+       return response ;
+
+   }
+
 }
 

@@ -1,4 +1,4 @@
-package com.techstack.corebanking.deentry.dto;
+package com.bayeesoft.deentry.dto;
 
 import lombok.Data;
 

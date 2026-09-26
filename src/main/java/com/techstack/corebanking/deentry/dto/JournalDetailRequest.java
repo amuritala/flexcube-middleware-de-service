@@ -1,11 +1,11 @@
-package com.techstack.corebanking.deentry.dto;
+package com.bayeesoft.deentry.dto;
 
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
-public class JournalDetailRequest {
+public class JournalDetailRequest extends MultiDeJournalRequest {
 
     private BigDecimal serialno;
 

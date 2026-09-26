@@ -1,5 +1,6 @@
-package com.techstack.corebanking.deentry.dto;
+package com.bayeesoft.deentry.dto;
 
+import jakarta.xml.bind.annotation.XmlElement;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -19,3 +20,4 @@ public class DetbsBatchMasterRequest {
 
     private BigDecimal crenttotal;
 }
+

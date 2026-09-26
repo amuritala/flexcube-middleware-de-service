@@ -1,9 +1,11 @@
-package com.techstack.corebanking.deentry.dto;
+package com.bayeesoft.deentry.dto;
 
+import com.bayeesoft.stub.TxnMISFullType;
 import lombok.Data;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 @Data
