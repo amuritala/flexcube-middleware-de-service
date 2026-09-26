@@ -546,7 +546,7 @@ public class DeServiceClient {
 
        QUERYMJRNLBOOKIOFSREQ fcubsMainHeader = new QUERYMJRNLBOOKIOFSREQ();
        FCUBSHEADERType fcubsheader = new FCUBSHEADERType();
-       fcubsheader.setSOURCE("FCUBS");
+       fcubsheader.setSOURCE("FCAT");
        fcubsheader.setUBSCOMP(UBSCOMPType.FCUBS);
        fcubsheader.setMSGID("");
        fcubsheader.setCORRELID(null);
