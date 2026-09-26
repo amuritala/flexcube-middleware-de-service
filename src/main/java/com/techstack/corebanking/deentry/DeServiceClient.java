@@ -1,16 +1,16 @@
 package com.techstack.corebanking.deentry;
 
-
-
-
-
 import com.techstack.corebanking.DTO.QueryRequest;
 import com.techstack.corebanking.DTO.ReversalRequest;
 import com.techstack.corebanking.deentry.dto.AutorizeRequeat;
+import com.techstack.corebanking.deentry.dto.CommonReversalEntriesRequest;
 import com.techstack.corebanking.deentry.dto.JournalDetailRequest;
 import com.techstack.corebanking.deentry.dto.MultiDeJournalRequest;
 import com.techstack.corebanking.deentry.dto.TxnMISFullTypeRequest;
+import com.techstack.corebanking.deentry.util.RequestUtil;
 import com.techstack.corebanking.stub.*;
+import com.techstack.corebanking.deentry.util.RequestUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +26,10 @@ import java.util.List;
 public class DeServiceClient {
     @Autowired
     private Jaxb2Marshaller marshaller;
+
+    @Autowired
+    private RequestUtil requestUtil;
+
     private WebServiceTemplate template;
 
     private static final Logger LOGGER =
@@ -118,7 +122,8 @@ public class DeServiceClient {
         /*
          * FCUBS HEADER
          */
-        FCUBSHEADERType header = buildFcubsHeader();
+        FCUBSHEADERType header = requestUtil.createHeader();
+        header.setBRANCH(request.getBranchcode());
 
         soapRequest.setFCUBSHEADER(header);
 
@@ -136,23 +141,6 @@ public class DeServiceClient {
         soapRequest.setFCUBSBODY(body);
 
         return soapRequest;
-    }
-
-    private FCUBSHEADERType buildFcubsHeader() {
-
-        FCUBSHEADERType header = new FCUBSHEADERType();
-
-        header.setSOURCE(source);
-        header.setUBSCOMP(UBSCOMPType.FCUBS);
-        header.setMSGID("");
-        header.setUSERID(userId);
-        header.setPASSWORD(password);
-        header.setBRANCH(branch);
-        header.setMODULEID("");
-        header.setSERVICE(service);
-        header.setOPERATION(operation);
-
-        return header;
     }
 
     private MultiJrnlBookFullType buildJournal(
@@ -209,10 +197,6 @@ public class DeServiceClient {
         batchMaster.setCRENTTOTAL(request.getDetbsBatchMaster().getCrenttotal());
 
         journal.setDetbsBatchMaster(batchMaster);
-
-        System.out.println("Drentris is :" + request.getDetbsBatchMaster().getDrenttotal());
-        System.out.println("Crentris is :" + request.getDetbsBatchMaster().getCrenttotal());
-
         /*
          * Development batch master
          */
@@ -357,11 +341,6 @@ public class DeServiceClient {
                     "Journal transaction details are required"
             );
         }
-
-
-
-
-
     }
 
 
@@ -370,16 +349,9 @@ public class DeServiceClient {
     public  AUTHORIZEMJRNLBOOKFSFSRES authmuljn (AutorizeRequeat autorizeequeat) {
 
         AUTHORIZEMJRNLBOOKFSFSREQ fcubsMainHeader = new AUTHORIZEMJRNLBOOKFSFSREQ();
-        FCUBSHEADERType fcubsheader = new FCUBSHEADERType();
-        fcubsheader.setSOURCE("FCAT");
-        fcubsheader.setUBSCOMP(UBSCOMPType.FCUBS);
-        fcubsheader.setMSGID("");
-        fcubsheader.setCORRELID(null);
-        fcubsheader.setUSERID("TAKEON02");
-        fcubsheader.setPASSWORD("Oracle@2");
-        fcubsheader.setBRANCH("101");
-        fcubsheader.setMODULEID("");
-        fcubsheader.setSERVICE("FCUBSDEService");
+        FCUBSHEADERType fcubsheader = requestUtil.createHeader();
+
+        fcubsheader.setBRANCH(autorizeequeat.getBranchcode());
         fcubsheader.setOPERATION("AuthorizeMjrnlbook");
         fcubsMainHeader.setFCUBSHEADER(fcubsheader);
 
@@ -395,27 +367,16 @@ public class DeServiceClient {
         template = new WebServiceTemplate(marshaller);
         AUTHORIZEMJRNLBOOKFSFSRES response = (AUTHORIZEMJRNLBOOKFSFSRES)  template.marshalSendAndReceive(deServiceUrl,fcubsMainHeader);
         return response ;
-
-
     }
-
-
 
 
     public CREATEMJRNLBOOKFSFSRES CreateMuiltiv2 (MultiDeJournalRequest request) {
 
         String brn =  request.getDetbsJrnlTxnDetail().get(0).getBranchcode();
         CREATEMJRNLBOOKFSFSREQ fcubsMainHeader = new CREATEMJRNLBOOKFSFSREQ();
-        FCUBSHEADERType fcubsheader = new FCUBSHEADERType();
-        fcubsheader.setSOURCE("FCUBS");
-        fcubsheader.setUBSCOMP(UBSCOMPType.FCUBS);
-        fcubsheader.setMSGID("");
-        fcubsheader.setCORRELID(null);
-        fcubsheader.setUSERID("TAKEON02");
-        fcubsheader.setPASSWORD("Oracle@2");
-        fcubsheader.setBRANCH(brn);
-        fcubsheader.setMODULEID("");
-        fcubsheader.setSERVICE("FCUBSDEService");
+        FCUBSHEADERType fcubsheader = requestUtil.createHeader();
+
+        fcubsheader.setBRANCH(request.getBranchcode());
         fcubsheader.setOPERATION("CreateMjrnlbook");
         fcubsMainHeader.setFCUBSHEADER(fcubsheader);
 
@@ -508,33 +469,16 @@ public class DeServiceClient {
         return response ;
     }
 
-   public REVERSECOMMONREVERSALFSFSRES ReseverJrn (ReversalRequest reversalRequest) {
-
+   public REVERSECOMMONREVERSALFSFSRES ReseverJrn(ReversalRequest reversalRequest) {
 
        REVERSECOMMONREVERSALFSFSREQ fcubsMainHeader = new REVERSECOMMONREVERSALFSFSREQ();
-       FCUBSHEADERType fcubsheader = new FCUBSHEADERType();
-       fcubsheader.setSOURCE("FCUBS");
-       fcubsheader.setUBSCOMP(UBSCOMPType.FCUBS);
-       fcubsheader.setMSGID("");
-       fcubsheader.setCORRELID(null);
-       fcubsheader.setUSERID("TAKEON02");
-       fcubsheader.setPASSWORD("Oracle@2");
-       fcubsheader.setBRANCH("100");
-       fcubsheader.setMODULEID("");
-       fcubsheader.setSERVICE("FCUBSDEService");
+       FCUBSHEADERType fcubsheader = requestUtil.createHeader();
        fcubsheader.setOPERATION("ReverseCommonReversal");
        fcubsMainHeader.setFCUBSHEADER(fcubsheader);
-
-       CommonReversalFullType reserval = new CommonReversalFullType();
-       reserval.setTRNREFNO(reversalRequest.getTrnrefno());
-       reserval.setAMOUNTTAGG(reversalRequest.getAmounttagg());
-       reserval.setEVENTSRNOO(reversalRequest.getEventsrnoo());
-
-
-
+       CommonReversalFullType reversal = buildCommonReversalFullType(reversalRequest);
 
        REVERSECOMMONREVERSALFSFSREQ.FCUBSBODY flexbosy = new REVERSECOMMONREVERSALFSFSREQ.FCUBSBODY();
-       flexbosy.setAcvwsAllAcEntriesFull(reserval);
+       flexbosy.setAcvwsAllAcEntriesFull(reversal);
        fcubsMainHeader.setFCUBSBODY(flexbosy);
        template = new WebServiceTemplate(marshaller);
        REVERSECOMMONREVERSALFSFSRES response = (REVERSECOMMONREVERSALFSFSRES)  template.marshalSendAndReceive(deServiceUrl,fcubsMainHeader);
@@ -542,22 +486,46 @@ public class DeServiceClient {
 
    }
 
+   static CommonReversalFullType buildCommonReversalFullType(ReversalRequest request) {
+       CommonReversalFullType reversal = new CommonReversalFullType();
+       reversal.setTRNREFNO(request.getTrnrefno());
+       reversal.setAMOUNTTAGG(request.getAmounttagg());
+       reversal.setEVENTSRNOO(request.getEventsrnoo());
+
+       if (request.getAcvwsAllAcEntriesA() != null) {
+           for (CommonReversalEntriesRequest entryRequest : request.getAcvwsAllAcEntriesA()) {
+               if (entryRequest == null) {
+                   throw new IllegalArgumentException("Reversal entry cannot be null");
+               }
+
+               CommonReversalFullType.AcvwsAllAcEntriesA entry =
+                       new CommonReversalFullType.AcvwsAllAcEntriesA();
+               entry.setTRNREFNO(entryRequest.getTrnrefno());
+               entry.setACENTRYSRNO(entryRequest.getAcentrysrno());
+               entry.setEVENTT(entryRequest.getEventt());
+               entry.setDRCRINDD(entryRequest.getDrcrindd());
+               entry.setTRNCODE(entryRequest.getTrncode());
+               entry.setFCYAMOUNTT(entryRequest.getFcyamountt());
+               entry.setEXCHRATE(entryRequest.getExchrate());
+               entry.setLCYAMOUNTT(entryRequest.getLcyamountt());
+               entry.setTRNDT(entryRequest.getTrndt());
+               entry.setVALUEDT(entryRequest.getValuedt());
+               entry.setRELATEDACCOUNT(entryRequest.getRelatedaccount());
+               entry.setRELATEDREFERENCE(entryRequest.getRelatedreference());
+               entry.setMODULE(entryRequest.getModule());
+               entry.setAMOUNTTAG(entryRequest.getAmounttag());
+               reversal.getAcvwsAllAcEntriesA().add(entry);
+           }
+       }
+
+       return reversal;
+   }
+
    public QUERYMJRNLBOOKIOFSRES QueryMultiJrn(QueryRequest queryRequest) {
 
        QUERYMJRNLBOOKIOFSREQ fcubsMainHeader = new QUERYMJRNLBOOKIOFSREQ();
-       FCUBSHEADERType fcubsheader = new FCUBSHEADERType();
-       fcubsheader.setSOURCE("FCAT");
-       fcubsheader.setUBSCOMP(UBSCOMPType.FCUBS);
-       fcubsheader.setMSGID("");
-       fcubsheader.setCORRELID(null);
-       fcubsheader.setUSERID("TAKEON02");
-       fcubsheader.setPASSWORD("Oracle@2");
-       fcubsheader.setBRANCH("100");
-       fcubsheader.setMODULEID("");
-       fcubsheader.setSERVICE("FCUBSDEService");
-       fcubsheader.setOPERATION("QueryMjrnlbook");
+       FCUBSHEADERType fcubsheader = requestUtil.createHeader();
        fcubsMainHeader.setFCUBSHEADER(fcubsheader);
-
        MultiJrnlBookQueryIOType  multibookquery = new MultiJrnlBookQueryIOType() ;
        multibookquery.setREFERENCENO(queryRequest.getReferenceno());
 
@@ -567,8 +535,5 @@ public class DeServiceClient {
        template = new WebServiceTemplate(marshaller);
        QUERYMJRNLBOOKIOFSRES response = (QUERYMJRNLBOOKIOFSRES)  template.marshalSendAndReceive(deServiceUrl,fcubsMainHeader);
        return response ;
-
    }
-
 }
-

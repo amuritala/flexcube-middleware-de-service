@@ -1,10 +1,15 @@
 server:
   port: 9086
 fcubs:
-  de-service-url: http://10.1.12.71:8101/FCUBSDEService/FCUBSDEService
-  source: FCAT
-  user-id: TAKEON01
-  password: Oracle@2
-  branch: 101
-  service: FCUBSDEService
-  operation: CreateMjrnlbook
+  username: ${FCUBS_USERNAME:TAKEON02}
+  password: ${FCUBS_PASSWORD:Oracle@2}
+  service: ${FCUBS_SERVICE:FCUBSDEService}
+  de-service-url: ${FCUBS_DESERVICEURL:http://10.1.12.71:8101/FCUBSDEService/FCUBSDEService}
+  source: ${FCUBS_SOURCE:FCUBS}
+  ubscomp: ${FCUBS_UBSCOMP:FCUBS}
+  msgid: ${FCUBS_MSGID:}
+  correlid: ${FCUBS_CORRELID:}
+  userid: ${FCUBS_USERID:}
+  moduleid: ${FCUBS_MODULEID:}
+  branch: ${FCUBS_BRANCH:101}
+  operation: ${FCUBS_OPERATION:CreateMjrnlbook}

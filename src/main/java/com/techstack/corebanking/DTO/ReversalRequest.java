@@ -1,6 +1,6 @@
 package com.techstack.corebanking.DTO;
 
-import com.tecstack.corebanking.deentry.dto.CommonReversalEntriesRequest;
+import com.techstack.corebanking.deentry.dto.CommonReversalEntriesRequest;
 import jakarta.xml.bind.annotation.XmlElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
