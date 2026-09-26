@@ -1,6 +1,6 @@
-package com.bayeesoft.deentry.dto;
+package com.techstack.corebanking.deentry.dto;
 
-import com.bayeesoft.stub.TxnMISFullType;
+
 import lombok.Data;
 
 import javax.xml.datatype.XMLGregorianCalendar;

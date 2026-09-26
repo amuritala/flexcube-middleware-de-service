@@ -1,4 +1,4 @@
-package com.bayeesoft.deentry.dto;
+package com.tecstack.corebanking.deentry.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

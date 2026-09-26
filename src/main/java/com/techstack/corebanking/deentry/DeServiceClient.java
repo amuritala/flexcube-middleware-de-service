@@ -1,10 +1,16 @@
-package com.bayeesoft.deentry;
+package com.techstack.corebanking.deentry;
 
-import com.bayeesoft.DTO.QueryRequest;
-import com.bayeesoft.DTO.ReversalRequest;
-import com.bayeesoft.deentry.dto.*;
-import com.bayeesoft.stub.*;
 
+
+
+
+import com.techstack.corebanking.DTO.QueryRequest;
+import com.techstack.corebanking.DTO.ReversalRequest;
+import com.techstack.corebanking.deentry.dto.AutorizeRequeat;
+import com.techstack.corebanking.deentry.dto.JournalDetailRequest;
+import com.techstack.corebanking.deentry.dto.MultiDeJournalRequest;
+import com.techstack.corebanking.deentry.dto.TxnMISFullTypeRequest;
+import com.techstack.corebanking.stub.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,7 +110,7 @@ public class DeServiceClient {
     }
 
     private CREATEMJRNLBOOKFSFSREQ buildSoapRequest(
-            MultiDeJournalRequest request) {
+       MultiDeJournalRequest request) {
 
         CREATEMJRNLBOOKFSFSREQ soapRequest =
                 new CREATEMJRNLBOOKFSFSREQ();
@@ -252,7 +258,7 @@ public class DeServiceClient {
     }
 
     private MultiJrnlBookFullType.DetbsJrnlTxnDetail mapTransactionDetail(
-            JournalDetailRequest requestDetail){
+           JournalDetailRequest requestDetail){
 
         String drcr = requestDetail.getDrcr();
 

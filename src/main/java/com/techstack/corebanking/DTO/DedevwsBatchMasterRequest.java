@@ -1,4 +1,5 @@
-package com.bayeesoft.DTO;
+package com.techstack.corebanking.DTO;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

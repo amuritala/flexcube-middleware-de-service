@@ -1,4 +1,4 @@
-package com.bayeesoft.deentry.dto;
+package com.tecstack.corebanking.deentry.dto;
 
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlSchemaType;
